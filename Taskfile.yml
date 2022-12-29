@@ -1,0 +1,24 @@
+version: '3'
+
+vars:
+  SECRET_FILE: client_secret.json
+
+tasks:
+  run:
+    cmds:
+      - go run main.go
+    silent: true
+  test:
+    cmds:
+      - go test ./...
+    silent: true
+  build:
+    cmds:
+      - go build -v -o bin/plailyst
+    silent: true
+  deploy:
+    cmds:
+      - task: test
+      - task: build
+      - echo "{{.SECRET_FILE}}"
+    silent: true

@@ -1,0 +1,30 @@
+---
+channels:
+  # Get channel IDs from https://commentpicker.com/youtube-channel-id.php
+  - beinsportsusa:
+    id: UC0YatYmg5JRYzXJPxIdRd8g
+  - cbssportsgolazo:
+    id: UCET00YnetHT7tOpu12v8jxg
+  - NBCSports:
+    id: UCqZQlzSHbVJrwrn5XvzrzcA
+  - ESPNFC:
+    id: UC6c1z7bA__85CIWZ_jpCK-Q
+# Make sure above channels show matches from below teams :)
+teams:
+  - AC Milan
+  - PSG
+  - Manchester United
+  - Man United
+  - Manchester City
+  - Man City
+  - Arsenal
+  - Liverpool
+  - Real Madrid
+  - Barcelona
+terms:
+  - highlights
+  - highlight
+# Name of playlist ot add videos to. You need to have write permission for this
+# playlist.
+playlist: PLppTncK5Ux-fVwFzMrbzd3qpzweW6Lxyx
+# playlist: PLRa7VKFgmSqquCuk4fRoaANsDilFL6kew
