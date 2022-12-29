@@ -1,7 +1,15 @@
 # plailyst
-PlaiLyst applies custom filtering on given youtube channels and creates custom Youtube playlist
+PlaiLyst applies custom filtering on given youtube channels and creates custom Youtube playlist.
 
-# Note
+I create this tool to add my favorite football clubs match highlights to a custom Youtube's playlist so that I can just sit on the couch and watch all the highlights without searching for them and potentially getting spoilers by finding out about the results. 
+
+In case you share the same interests as me and live in the United States, you can simply add this playlist to your account: https://youtube.com/playlist?list=PLppTncK5Ux-fVwFzMrbzd3qpzweW6Lxyx
+
+The content of this playlist gets updated by me manually. I have to figure out a way to update youtube playlist contents using a service account, so that it can be periodically updated in the background without my intervention.
+
+If you're not interested in the teams that I follow or you cannot watch the contents from channels that I use, because you're not living in the United States, you can follow the rest of instructions to set up your own channel. I personally use this for football, but it can be used for anything, as you can customize list of youtube channels, mandatory keywords and optional ones.
+
+# Big Note
 This is a super beta version as of now. It has no UI and no deployment script as of now. I use this tool for my personal usage and I am not planning to create a user interface for it. Feel free to add one, if you'd like to contribute.
 
 # How to configure
