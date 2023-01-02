@@ -64,7 +64,6 @@ func setupLogger() {
 
 	log.SetFormatter(logFormatter)
 	log.SetLevel(log.InfoLevel)
-	log.SetReportCaller(true)
 	log.SetOutput(multiWriter)
 }
 

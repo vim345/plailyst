@@ -69,7 +69,7 @@ func (c *Crawler) exists(video *Video, videos []*youtube.PlaylistItem) bool {
 func (c *Crawler) getExistingVideos(playlistID string) ([]*youtube.PlaylistItem, error) {
 	part := []string{"snippet"}
 	call := c.service.PlaylistItems.List(part)
-	call = call.PlaylistId(playlistID)
+	call = call.PlaylistId(playlistID).MaxResults(maxResults * 2)
 	response, err := call.Do()
 	if err != nil {
 		return nil, err
@@ -101,7 +101,6 @@ func (c *Crawler) Run() {
 			for _, upload := range uploads {
 				if matches(upload.Title, c.configs.Teams, c.configs.Terms) == true {
 					if !c.exists(upload, existingVideos) {
-						log.Infof("Adding video to playlist = %+v\n", upload.Title)
 						c.addToPlayList(upload)
 					}
 				}
@@ -130,7 +129,7 @@ func (c *Crawler) addToPlayList(video *Video) {
 	if err != nil {
 		log.Warnf("Couldn't add %+v to playlist. Got %+v", video, err)
 	} else {
-		log.Infof("Added %+v to playlist", video)
+		log.Infof("Added %+s: %+s to playlist", video.ID, video.Title)
 	}
 }
 
