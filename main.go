@@ -48,7 +48,7 @@ func readYaml(path string) *crawler.Configs {
 func setupLogger() {
 	lumberjackLogger := &lumberjack.Logger{
 		// Log file abbsolute path, os agnostic
-		Filename:   filepath.ToSlash("~/logs/plailyst/plailist.log"),
+		Filename:   filepath.ToSlash("./logs/plailyst/plailist.log"),
 		MaxSize:    5,
 		MaxBackups: 10,
 		MaxAge:     30,   // days
