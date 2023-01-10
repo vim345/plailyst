@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/natefinch/lumberjack"
@@ -47,8 +46,6 @@ func readYaml(path string) *crawler.Configs {
 
 func setupLogger() {
 	lumberjackLogger := &lumberjack.Logger{
-		// Log file abbsolute path, os agnostic
-		Filename:   filepath.ToSlash("./logs/plailyst/plailist.log"),
 		MaxSize:    5,
 		MaxBackups: 10,
 		MaxAge:     30,   // days
@@ -73,7 +70,6 @@ func init() {
 }
 
 func (ws *wrapperStruct) callBack(w http.ResponseWriter, r *http.Request) {
-	// url := "http://localhost:8765/login/callback?state=rCRxv20Odp7DeEaOgxHRyg%3D%3D&code=4/0AWgavdc117ValCjz7TL1KIAYUJ8P-jLj4_ESLy6w6WKMEBX51qvO2sY6CXEkTZbpu2PQQw&scope=https://www.googleapis.com/auth/youtube"
 	// Read oauthState from Cookie
 	oauthState, _ := r.Cookie("oauthstate")
 
@@ -95,7 +91,6 @@ func (ws *wrapperStruct) callBack(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ws *wrapperStruct) handler(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprintf(w, "Service: %s\n", ws.Service.BasePath)
 	if ws.Service == nil {
 		fmt.Fprintf(w, "Go to login page to proceed!")
 	} else {
@@ -111,18 +106,26 @@ func (ws *wrapperStruct) login(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	server := &http.Server{
-		Addr: fmt.Sprintf(":8765"),
-	}
 	handlers := newWrapperStruct(oauth.NewOauth())
 	http.HandleFunc("/", handlers.handler)
 	http.HandleFunc("/login/", handlers.login)
 	http.HandleFunc("/login/callback", handlers.callBack)
 
-	log.Printf("Starting HTTP Server. Listening at %q", server.Addr)
-	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		log.Printf("%v", err)
+	cert := os.Getenv("CERT")
+	privateKey := os.Getenv("PRIVATE_KEY")
+	if len(privateKey) == 0 || len(cert) == 0 {
+		log.Printf("Starting HTTP Server. Listening at 8765")
+		if err := http.ListenAndServe(":8765", nil); err != http.ErrServerClosed {
+			log.Printf("%v", err)
+		} else {
+			log.Println("Server closed!")
+		}
 	} else {
-		log.Println("Server closed!")
+		log.Printf("Starting HTTPS Server. Listening at 443")
+		if err := http.ListenAndServeTLS(":443", cert, privateKey, nil); err != http.ErrServerClosed {
+			log.Printf("%v", err)
+		} else {
+			log.Println("Server closed!")
+		}
 	}
 }

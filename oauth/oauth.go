@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -58,7 +59,11 @@ func (o *LocalOauth) GetService(code string) (*youtube.Service, error) {
 
 // NewOauth creates a new Oauth Object.
 func NewOauth() *LocalOauth {
-	b, err := ioutil.ReadFile("client_secret.json")
+	secret := os.Getenv("CLIENT_SECRET")
+	if len(secret) == 0 {
+		secret = "client_secret.json"
+	}
+	b, err := ioutil.ReadFile(secret)
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}

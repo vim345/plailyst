@@ -1,8 +1,5 @@
 version: '3'
 
-vars:
-  SECRET_FILE: client_secret.json
-
 tasks:
   run:
     cmds:
@@ -20,5 +17,6 @@ tasks:
     cmds:
       - task: test
       - task: build
-      - echo "{{.SECRET_FILE}}"
+      - scp bin/plailyst mohi@192.168.1.11:~/apps/plailyst
+      # - ssh -t mohi@192.168.1.11 "sudo systemctl restart plailyst.service"
     silent: true
