@@ -75,7 +75,7 @@ func (ws *wrapperStruct) callBack(w http.ResponseWriter, r *http.Request) {
 
 	if r.FormValue("state") != oauthState.Value {
 		log.Println("invalid oauth google state")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/output", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -107,7 +107,10 @@ func (ws *wrapperStruct) login(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	handlers := newWrapperStruct(oauth.NewOauth())
-	http.HandleFunc("/", handlers.handler)
+	fs := http.FileServer(http.Dir("./static"))
+
+	http.Handle("/", fs)
+	http.HandleFunc("/output", handlers.handler)
 	http.HandleFunc("/login/", handlers.login)
 	http.HandleFunc("/login/callback", handlers.callBack)
 
