@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -27,7 +26,7 @@ func newWrapperStruct(oauth *oauth.LocalOauth) *wrapperStruct {
 }
 
 func readYaml(path string) *crawler.Configs {
-	yfile, err := ioutil.ReadFile(path)
+	yfile, err := os.ReadFile(path)
 	if err != nil {
 		log.Errorf("Cannot find the configs file = %+v\n", err)
 		os.Exit(1)
@@ -75,7 +74,7 @@ func (ws *wrapperStruct) callBack(w http.ResponseWriter, r *http.Request) {
 
 	if r.FormValue("state") != oauthState.Value {
 		log.Println("invalid oauth google state")
-		http.Redirect(w, r, "/output", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, "/run", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -90,13 +89,25 @@ func (ws *wrapperStruct) callBack(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
+func (ws *wrapperStruct) main(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Great job out of you!")
+}
+
 func (ws *wrapperStruct) handler(w http.ResponseWriter, r *http.Request) {
+
 	if ws.Service == nil {
-		fmt.Fprintf(w, "Go to login page to proceed!")
+		fmt.Fprintf(w, "Manually log in")
 	} else {
-		configs := readYaml("configs.yaml")
+		configsFile := os.Getenv("CONFIGS")
+		var configs *crawler.Configs
+		if len(configsFile) == 0 {
+			configs = readYaml("configs.yaml")
+		} else {
+			configs = readYaml(configsFile)
+		}
 		c := crawler.NewCrawler(configs, ws.Service)
 		c.Run()
+		fmt.Fprintf(w, "Updated videos = %+v\n", c.GetUpdatedVideos())
 		fmt.Fprintf(w, "Updated the playist. Have fun!")
 	}
 }
@@ -109,10 +120,11 @@ func main() {
 	handlers := newWrapperStruct(oauth.NewOauth())
 	fs := http.FileServer(http.Dir("./static"))
 
-	http.Handle("/", fs)
-	http.HandleFunc("/output", handlers.handler)
+	http.Handle("/testing", fs)
+	http.HandleFunc("/run", handlers.handler)
 	http.HandleFunc("/login/", handlers.login)
 	http.HandleFunc("/login/callback", handlers.callBack)
+	http.HandleFunc("/", handlers.main)
 
 	cert := os.Getenv("CERT")
 	privateKey := os.Getenv("PRIVATE_KEY")
@@ -124,8 +136,8 @@ func main() {
 			log.Println("Server closed!")
 		}
 	} else {
-		log.Printf("Starting HTTPS Server. Listening at 443")
-		if err := http.ListenAndServeTLS(":443", cert, privateKey, nil); err != http.ErrServerClosed {
+		log.Printf("Starting HTTPS Server. Listening at 8443")
+		if err := http.ListenAndServeTLS(":8443", cert, privateKey, nil); err != http.ErrServerClosed {
 			log.Printf("%v", err)
 		} else {
 			log.Println("Server closed!")

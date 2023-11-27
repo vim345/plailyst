@@ -9,21 +9,27 @@ channels:
     id: UCqZQlzSHbVJrwrn5XvzrzcA
   - ESPNFC:
     id: UC6c1z7bA__85CIWZ_jpCK-Q
-# Make sure above channels show matches from below teams :)
+
 teams:
   - AC Milan
-  - PSG
+  - Milan
   - Manchester United
   - Man United
   - Manchester City
   - Man City
-  - Arsenal
   - Liverpool
   - Real Madrid
   - Barcelona
+  - Inter Miami
+  - Al Nassr
+  - AlNassr
+  - AlNasr
 terms:
   - highlights
   - highlight
+excludes:
+  - reports
+  - report
 # Name of playlist ot add videos to. You need to have write permission for this
 # playlist.
 playlist: PLppTncK5Ux-fVwFzMrbzd3qpzweW6Lxyx

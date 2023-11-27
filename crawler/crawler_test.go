@@ -6,7 +6,8 @@ var cases = []struct {
 	name     string
 	title    string
 	teams    []string
-	keywords []string
+	terms    []string
+	excludes []string
 	expected bool
 }{
 	{
@@ -14,6 +15,7 @@ var cases = []struct {
 		"AC Milan vs Inter highlights",
 		[]string{"AC Milan", "Juventus"},
 		[]string{"highlights"},
+		[]string{"reports"},
 		true,
 	},
 	{
@@ -21,6 +23,7 @@ var cases = []struct {
 		"AC milan vs inter highlights",
 		[]string{"AC Milan", "Juventus"},
 		[]string{"HIGHLIGHTS"},
+		[]string{"reports"},
 		true,
 	},
 	{
@@ -28,6 +31,7 @@ var cases = []struct {
 		"AC Milan vs Inter highlights",
 		[]string{"Napoli", "Juventus"},
 		[]string{"highlights"},
+		[]string{"reports"},
 		false,
 	},
 	{
@@ -35,6 +39,7 @@ var cases = []struct {
 		"AC Milan vs Inter highlights",
 		[]string{"AC Milan", "Juventus"},
 		[]string{"Incorrect"},
+		[]string{"reports"},
 		false,
 	},
 	{
@@ -42,6 +47,15 @@ var cases = []struct {
 		"Lyon highlights",
 		[]string{"AC Milan", "Juventus"},
 		[]string{"highlights"},
+		[]string{"reports"},
+		false,
+	},
+	{
+		"Everything is ok, but it contains a keyword that should be excluded",
+		"Reports AC Milan vs Inter highlights",
+		[]string{"AC Milan", "Juventus"},
+		[]string{"highlights"},
+		[]string{"reports"},
 		false,
 	},
 }
@@ -50,7 +64,16 @@ func TestMatch(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
-			out := matches(c.title, c.teams, c.keywords)
+			configs := &Configs{
+				[]Channel{
+					{ID: "BLAH"},
+				},
+				c.teams,
+				c.terms,
+				c.excludes,
+				"FAKE",
+			}
+			out := matches(c.title, configs)
 			if out != c.expected {
 				t.Errorf("=> %v, want %v", out, c.expected)
 			}

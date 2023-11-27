@@ -28,18 +28,20 @@ type Configs struct {
 	Channels []Channel `yaml:"channels"`
 	Teams    []string  `yaml:"teams"`
 	Terms    []string  `yaml:"terms"`
+	Excludes []string  `yaml:"excludes"`
 	Playlist string    `yaml:"playlist"`
 }
 
 // Crawler crawls youtube channels and filters uploads that match the requirements.
 type Crawler struct {
-	service *youtube.Service
-	configs *Configs
+	service       *youtube.Service
+	configs       *Configs
+	updatedVideos []*Video
 }
 
 // NewCrawler Creates a new crawler object.
 func NewCrawler(configs *Configs, service *youtube.Service) *Crawler {
-	return &Crawler{service, configs}
+	return &Crawler{service, configs, []*Video{}}
 }
 
 func matcher(title string, items []string) bool {
@@ -53,8 +55,13 @@ func matcher(title string, items []string) bool {
 	return found
 }
 
-func matches(title string, teams []string, keywords []string) bool {
-	return matcher(title, teams) && matcher(title, keywords)
+func matches(title string, configs *Configs) bool {
+	return matcher(title, configs.Teams) && matcher(title, configs.Terms) && !matcher(title, configs.Excludes)
+}
+
+// GetUpdatedVideos returns a list of updated videos.
+func (c *Crawler) GetUpdatedVideos() []*Video {
+	return c.updatedVideos
 }
 
 func (c *Crawler) exists(video *Video, videos []*youtube.PlaylistItem) bool {
@@ -99,7 +106,7 @@ func (c *Crawler) Run() {
 				log.Errorf("Cannot find uploads for channel %+v, %+v\n", ch.ID, err)
 			}
 			for _, upload := range uploads {
-				if matches(upload.Title, c.configs.Teams, c.configs.Terms) == true {
+				if matches(upload.Title, c.configs) == true {
 					if !c.exists(upload, existingVideos) {
 						c.addToPlayList(upload)
 					}
@@ -129,6 +136,7 @@ func (c *Crawler) addToPlayList(video *Video) {
 	if err != nil {
 		log.Warnf("Couldn't add %+v to playlist. Got %+v", video, err)
 	} else {
+		c.updatedVideos = append(c.updatedVideos, video)
 		log.Infof("Added %+s: %+s to playlist", video.ID, video.Title)
 	}
 }
