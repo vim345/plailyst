@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -117,6 +118,11 @@ func (ws *wrapperStruct) login(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	cert := flag.String("cert", "", "Cert file")
+	privateKey := flag.String("private", "", "Private key")
+
+	flag.Parse()
+
 	handlers := newWrapperStruct(oauth.NewOauth())
 	fs := http.FileServer(http.Dir("./static"))
 
@@ -126,9 +132,7 @@ func main() {
 	http.HandleFunc("/login/callback", handlers.callBack)
 	http.HandleFunc("/", handlers.main)
 
-	cert := os.Getenv("CERT")
-	privateKey := os.Getenv("PRIVATE_KEY")
-	if len(privateKey) == 0 || len(cert) == 0 {
+	if *privateKey == "" || *cert == "" {
 		log.Printf("Starting HTTP Server. Listening at 8765")
 		if err := http.ListenAndServe(":8765", nil); err != http.ErrServerClosed {
 			log.Printf("%v", err)
@@ -136,8 +140,8 @@ func main() {
 			log.Println("Server closed!")
 		}
 	} else {
-		log.Printf("Starting HTTPS Server. Listening at 8443")
-		if err := http.ListenAndServeTLS(":8443", cert, privateKey, nil); err != http.ErrServerClosed {
+		log.Printf("Starting HTTPS Server. Listening at 2096 ")
+		if err := http.ListenAndServeTLS(":2096", *cert, *privateKey, nil); err != http.ErrServerClosed {
 			log.Printf("%v", err)
 		} else {
 			log.Println("Server closed!")

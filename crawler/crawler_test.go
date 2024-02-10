@@ -1,6 +1,10 @@
 package crawler
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/sirupsen/logrus"
+)
 
 var cases = []struct {
 	name     string
